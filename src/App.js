@@ -1,25 +1,45 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import Chartline from "./components/Chartline";
+import style from "./App.module.css";
+import { AlertCard } from "./components/AlertCard/AlertCard";
+import ChartBar from "./components/ChartBar";
+import { getAlerts } from "./function/alert";
 
-function App() {
+const App = () => {
+  const [alldata, setalldata] = useState([]);
+  const [totalalerts, settotalalerts] = useState();
+  const [ok, setok] = useState(false);
+
+  const fetchAlerts = () => {
+    getAlerts().then((res) => {
+      setalldata(res.data.alertsData);
+      settotalalerts(res.data.alertsCount);
+      setok(false);
+    });
+  };
+  useEffect(() => {
+    fetchAlerts();
+  }, []);
+  useEffect(() => {
+    {
+      ok && fetchAlerts();
+    }
+  }, [ok]);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className={style.container}>
+      <div>
+        <AlertCard setok={setok} />
+      </div>
+      <div className={style.chartscontainer}>
+        <div className={style.chart}>
+          <Chartline alldata={alldata} />
+        </div>
+        <div className={style.chart}>
+          <ChartBar alldata={alldata} />
+        </div>
+      </div>
     </div>
   );
-}
+};
 
 export default App;
